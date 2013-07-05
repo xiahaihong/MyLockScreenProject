@@ -62,7 +62,7 @@ public class ChannelHorizontalScrollView extends HorizontalScrollView {
                 mView = getChildAt(0);
                 if (MotionEvent.ACTION_DOWN != event.getAction()) {
                     mScrollX = getScrollX();
-                    // 惯性滑动
+
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {

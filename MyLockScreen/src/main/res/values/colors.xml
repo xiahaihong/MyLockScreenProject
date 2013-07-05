@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="channel_news_title_no_press">#9d958e</color>
+    <color name="channel_news_title_press">#E15530</color>
+</resources>
