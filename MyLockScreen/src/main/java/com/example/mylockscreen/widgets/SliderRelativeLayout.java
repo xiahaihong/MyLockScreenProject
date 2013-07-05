@@ -16,8 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.mylockscreen.R;
-import com.example.mylockscreen.activities.ActivityScreen;
-import com.example.mylockscreen.activities.MainActivity;
+import com.example.mylockscreen.activities.LockScreenActivity;
 
 public class SliderRelativeLayout extends RelativeLayout {
 
@@ -133,7 +132,7 @@ public class SliderRelativeLayout extends RelativeLayout {
             resetViewState();
             virbate();
 
-            mainHandler.obtainMessage(ActivityScreen.MSG_LOCK_SUCESS).sendToTarget();
+            mainHandler.obtainMessage(LockScreenActivity.MSG_LOCK_SUCESS).sendToTarget();
         }
         else {
             mLastMoveX = x ;

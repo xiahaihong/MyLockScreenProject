@@ -21,9 +21,9 @@ import android.widget.ImageView;
 import com.example.mylockscreen.R;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
-public class ActivityScreen extends Activity
+public class LockScreenActivity extends Activity
 {
-    private final String TAG = "ActivityScreen";
+    private final String TAG = "LockScreenActivity";
     TimeChangeReceiver mTimeChangeReceiver;
     public static int MSG_LOCK_SUCESS = 1;
     private SliderRelativeLayout sliderLayout = null;
@@ -53,7 +53,7 @@ public class ActivityScreen extends Activity
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mContext = ActivityScreen.this;
+        mContext = LockScreenActivity.this;
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN ,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -131,7 +131,7 @@ public class ActivityScreen extends Activity
             {
                 public void run()
                 {
-                    ActivityScreen.this.mScreenView.mDotSwitchView.play();
+                    LockScreenActivity.this.mScreenView.mDotSwitchView.play();
                 }
             }
                     , 500L);*/
@@ -159,8 +159,8 @@ public class ActivityScreen extends Activity
         public void onReceive(Context paramContext, Intent paramIntent)
         {
             String str = paramIntent.getAction();
-            //ActivityScreen.this.log.d(str);
-            ActivityScreen.this.changeTime();
+            //LockScreenActivity.this.log.d(str);
+            LockScreenActivity.this.changeTime();
         }
 
         public void register()
@@ -168,12 +168,12 @@ public class ActivityScreen extends Activity
             IntentFilter localIntentFilter = new IntentFilter();
             localIntentFilter.addAction("android.intent.action.TIME_SET");
             localIntentFilter.addAction("android.intent.action.TIME_TICK");
-            ActivityScreen.this.registerReceiver(this, localIntentFilter);
+            LockScreenActivity.this.registerReceiver(this, localIntentFilter);
         }
 
         public void unregister()
         {
-            ActivityScreen.this.unregisterReceiver(this);
+            LockScreenActivity.this.unregisterReceiver(this);
         }
     }
     private void changeTime()

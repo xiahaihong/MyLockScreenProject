@@ -12,7 +12,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import com.example.mylockscreen.R;
-import com.example.mylockscreen.services.ServiceScreen;
+import com.example.mylockscreen.services.KeyGuardService;
 import com.example.mylockscreen.utils.Preferences;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Preferences.setUserPrefBoolean(MainActivity.this, "app_on", b);
-                Intent localIntent = new Intent(MainActivity.this, ServiceScreen.class);
+                Intent localIntent = new Intent(MainActivity.this, KeyGuardService.class);
                 Log.d(TAG, "xhh: checked changed");
                 if (b)
                     localIntent.putExtra("action", "com.secretlisa.beidanci.SWITCH_ON");
