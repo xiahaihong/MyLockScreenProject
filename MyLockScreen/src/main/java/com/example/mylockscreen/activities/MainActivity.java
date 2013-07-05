@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
 
     private Context mContext = null ;
 
-    public static int MSG_LOCK_SUCESS = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

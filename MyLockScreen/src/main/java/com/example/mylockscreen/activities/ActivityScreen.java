@@ -8,30 +8,61 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import com.example.mylockscreen.R;
+import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
 public class ActivityScreen extends Activity
 {
     private final String TAG = "ActivityScreen";
     TimeChangeReceiver mTimeChangeReceiver;
+    public static int MSG_LOCK_SUCESS = 1;
+    private SliderRelativeLayout sliderLayout = null;
+
+    private ImageView imgView_getup_arrow; // 动画图片
+    private AnimationDrawable animArrowDrawable = null;
+
+    private Context mContext = null ;
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        sliderLayout = (SliderRelativeLayout)findViewById(R.id.slider_layout);
+        imgView_getup_arrow = (ImageView)findViewById(R.id.getup_arrow);
+        animArrowDrawable = (AnimationDrawable) imgView_getup_arrow.getBackground() ;
     }
 
+    private Handler mHandler =new Handler (){
+
+        public void handleMessage(Message msg){
+
+            Log.i(TAG, "handleMessage :  #### " );
+
+            if(MSG_LOCK_SUCESS == msg.what)
+                finish(); // 锁屏成功时，结束我们的Activity界面
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mContext = ActivityScreen.this;
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN ,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         Log.d(TAG, "xhh: activity screen lock view create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen);
         initViews();
         this.mTimeChangeReceiver = new TimeChangeReceiver();
+        sliderLayout.setMainHandler(mHandler);
     }
     public boolean dispatchKeyEvent(KeyEvent paramKeyEvent)
     {
@@ -58,10 +89,18 @@ public class ActivityScreen extends Activity
         //this.log.d("=========onNewIntent========");
     }
 
+    private Runnable AnimationDrawableTask = new Runnable(){
+
+        public void run(){
+            animArrowDrawable.start();
+            mHandler.postDelayed(AnimationDrawableTask, 300);
+        }
+    };
     protected void onPause()
     {
         Log.d(TAG, "xhh: activity screen lock view pause");
         super.onPause();
+        animArrowDrawable.stop();
         try
         {
 /*            if (this.flagRigister)
@@ -80,6 +119,7 @@ public class ActivityScreen extends Activity
     protected void onResume()
     {
         super.onResume();
+        mHandler.postDelayed(AnimationDrawableTask, 300);
 /*        Utils.checkDailyWord(this);
         changeTime();
         this.mTimeChangeReceiver.register();
@@ -138,11 +178,21 @@ public class ActivityScreen extends Activity
     }
     private void changeTime()
     {
-/*        long l = Utils.getNowTime();
-        this.txtTime.setText(Utils.formatTime("HH:mm", l));
-        String[] arrayOfString = Utils.formatTime("MM-dd", l).split("-");
-        int i = Integer.valueOf(arrayOfString[0]).intValue();
-        int j = Integer.valueOf(arrayOfString[1]).intValue();
-        this.txtDate.setText(i + "月" + j + "日 " + Utils.getWeekDay(l));*/
     }
+
+/*
+    public void onAttachedToWindow() {
+        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        super.onAttachedToWindow();
+    }
+
+
+    public boolean onKeyDown(int keyCode ,KeyEvent event){
+
+        if(event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+            return true ;
+        else
+            return super.onKeyDown(keyCode, event);
+
+    }*/
 }
