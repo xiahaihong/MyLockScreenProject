@@ -92,12 +92,14 @@ public class LockScreenActivity extends Activity
     void addViewPagerView(){
         mViewPagerViews = new ArrayList<View>();
         mViewData = new ArrayList<String>();
-        mViewData.add("1");
-        mViewData.add("2");
-        mViewData.add("3");
+        for (int i = 0; i < 10; i++){
+            mViewData.add("Tab " + String.valueOf(i));
+        }
         for (int i = 0; i < mViewData.size(); i++){
             View v = getLayoutInflater().inflate(R.layout.item_view, null);
-            mViewPager.addView(v);
+            TextView textView = (TextView)v.findViewById(R.id.item_text);
+            textView.setText("Content " + i);
+            v.setTag(mViewData.get(i));
             mViewPagerViews.add(v);
         }
         initTitleTab();
@@ -138,7 +140,7 @@ public class LockScreenActivity extends Activity
         }
     }
     private void setViewPagerAdapter() {
-        mAdapter = new LockScreenPageAdapter(this, mViewPagerViews);
+        mAdapter = new LockScreenPageAdapter(mViewPagerViews);
         mViewPager.setAdapter(mAdapter);
         moveTitleLabel(0);
         mViewPager.setCurrentItem(0);
@@ -183,9 +185,9 @@ public class LockScreenActivity extends Activity
             }
             scrollViewWidth += width;
 
-            if (i == mLinearLayout.getChildCount() - 1) {
+/*            if (i == mLinearLayout.getChildCount() - 1) {
                 break;
-            }
+            }*/
             if (position != i) {
                 itemView.setTextColor(getResources().getColor(
                         R.color.channel_news_title_no_press));

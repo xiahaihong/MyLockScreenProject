@@ -16,7 +16,7 @@ public class LockScreenPageAdapter extends PagerAdapter {
 
     private List<View> mViewList;
 
-    public LockScreenPageAdapter(Context context, List<View> list){
+    public LockScreenPageAdapter(List<View> list){
         if (list != null){
             mViewList = list;
         } else {
@@ -41,25 +41,14 @@ public class LockScreenPageAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(View view, int position) {
         View tab = mViewList.get(position);
-        if (tab != null){
-            return tab;
-        }
-        return  null;
+        ((ViewPager) view).addView(tab, 0);
+        return tab;
     }
 
     // 判断View和对象是否为同一个View
     @Override
     public boolean isViewFromObject(View arg0, Object arg1) {
-        String tag0 = (String)arg0.getTag();
-        String tag1 = (String)((View) arg1).getTag();
-        if (tag0 == null){
-            if (tag1 == null){
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return tag0.equals(tag1);
+        return arg0 == arg1;
     }
 
     @Override

@@ -10,7 +10,7 @@
         android:id="@+id/item_text"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="item"
-        android:textSize="100sp"
+        android:text="Content"
+        android:textSize="80sp"
         android:layout_gravity="center"></TextView>
 </LinearLayout>
