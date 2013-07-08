@@ -25,19 +25,19 @@ public class LockScreenPageAdapter extends PagerAdapter {
     }
 
 
-    // 销毁position位置的界面
+
     @Override
     public void destroyItem(View view, int position, Object obj) {
         ((ViewPager) view).removeView(mViewList.get(position));
     }
 
-    // 获取当前窗体界面数
+
     @Override
     public int getCount() {
         return mViewList.size();
     }
 
-    // 初始化position位置的界面
+
     @Override
     public Object instantiateItem(View view, int position) {
         View tab = mViewList.get(position);

@@ -8,10 +8,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.CallLog;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.*;
@@ -21,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.example.mylockscreen.R;
 import com.example.mylockscreen.adapters.LockScreenPageAdapter;
+import com.example.mylockscreen.controllers.Controllers;
+import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.widgets.ChannelHorizontalScrollView;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
@@ -48,6 +53,8 @@ public class LockScreenActivity extends Activity
 
     private int mPreSelectItem = 0;
     private Context mContext = null ;
+    private String SEPARATOR = "==== separator_for_lock_screen ===== \n";
+
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -73,7 +80,7 @@ public class LockScreenActivity extends Activity
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN ,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        Log.d(TAG, "xhh: activity screen lock view create");
+        Log.d(TAG, Constants.TAG + "activity screen lock view create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lock_screen_activity);
         initViews();
@@ -89,6 +96,65 @@ public class LockScreenActivity extends Activity
         addViewPagerView();
     }
 
+    String getSMSFromLocal(){
+        String sms = Controllers.getInstance().getFileService().readStorage("sms");
+        return sms;
+    }
+    private String getNewSmsCount() {
+        String result = "";
+        Cursor cur = getContentResolver().query(Uri.parse("content://sms"), null,
+                "type = 1 and read = 0", null, null);
+
+        try{
+            for (cur.moveToFirst(); !cur.isAfterLast(); cur.moveToNext()) {
+                String address = cur.getString(cur.getColumnIndex("address"));
+                String person = cur.getString(cur.getColumnIndex("person"));
+                String date = cur.getString(cur.getColumnIndex("date"));
+                String date_sent = cur.getString(cur.getColumnIndex("date_sent"));
+                String subject = cur.getString(cur.getColumnIndex("subject"));
+                String body = cur.getString(cur.getColumnIndex("body"));
+                String seen = cur.getString(cur.getColumnIndex("seen"));
+                result += address + person + date + date_sent + subject + body + seen + SEPARATOR;
+            }
+        }finally{
+            if(null != cur){
+                cur.close();
+            }
+        }
+        return result;
+    }
+
+    private String readMissCall() {
+        String result = "";
+/*
+        Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, new String[] {
+                CallLog.Calls.TYPE
+        }, " type=? and new=?", new String[] {
+                CallLog.Calls.MISSED_TYPE + "", "1"
+        }, "date desc");
+*/
+
+        Cursor cur = getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
+                " type=? ", new String[] {
+                CallLog.Calls.MISSED_TYPE + ""
+        }, "date desc");
+
+        try{
+            for (cur.moveToFirst(); !cur.isAfterLast(); cur.moveToNext()) {
+                String name = cur.getString(cur.getColumnIndex("name"));
+                String number = cur.getString(cur.getColumnIndex("formatted_number"));
+                String date = cur.getString(cur.getColumnIndex("date"));
+                result += name + number + date + SEPARATOR;
+            }
+        }finally{
+            if(null != cur){
+                cur.close();
+            }
+        }
+        Log.d(TAG, Constants.TAG + result);
+        return result;
+    }
+
     void addViewPagerView(){
         mViewPagerViews = new ArrayList<View>();
         mViewData = new ArrayList<String>();
@@ -98,7 +164,20 @@ public class LockScreenActivity extends Activity
         for (int i = 0; i < mViewData.size(); i++){
             View v = getLayoutInflater().inflate(R.layout.item_view, null);
             TextView textView = (TextView)v.findViewById(R.id.item_text);
-            textView.setText("Content " + i);
+
+            String text = "Content " + i;
+            if (i == 0){
+                text = getNewSmsCount();
+            } else if (i == 1){
+                text = readMissCall();
+            }
+            if ("".equals(text)){
+                text = "Content " + i;
+            } else {
+                v.setBackgroundColor(R.color.channel_news_title_no_press);
+                textView.setTextSize(20);
+            }
+            textView.setText(text);
             v.setTag(mViewData.get(i));
             mViewPagerViews.add(v);
         }
@@ -274,7 +353,7 @@ public class LockScreenActivity extends Activity
 
     protected void onDestroy()
     {
-        Log.d(TAG, "xhh: activity screen lock view destroy");
+        Log.d(TAG, Constants.TAG + "activity screen lock view destroy");
         super.onDestroy();
 /*        if ((this.bitmap != null) && (!this.bitmap.isRecycled()))
             this.bitmap.recycle();*/
@@ -301,7 +380,7 @@ public class LockScreenActivity extends Activity
     };
     protected void onPause()
     {
-        Log.d(TAG, "xhh: activity screen lock view pause");
+        Log.d(TAG, Constants.TAG + "activity screen lock view pause");
         super.onPause();
         animArrowDrawable.stop();
         try

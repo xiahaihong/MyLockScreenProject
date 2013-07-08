@@ -11,6 +11,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.example.mylockscreen.activities.LockScreenActivity;
+import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.utils.Preferences;
 
 /**
@@ -21,6 +22,7 @@ public class KeyGuardService extends Service {
     public static final String ACTION_STOP = "com.secretlisa.beidanci.SWITCH_OFF";
     public static final String TAG = "KeyGuardService";
     public KeyguardManager.KeyguardLock keyguardLock;
+
     PhoneStateListener listener = new PhoneStateListener()
     {
         public void onCallStateChanged(int paramAnonymousInt, String paramAnonymousString)
@@ -45,10 +47,10 @@ public class KeyGuardService extends Service {
     {
         public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent)
         {
-            Log.d(TAG, "xhh:service receive");
+            Log.d(TAG, Constants.TAG + "service receive");
             if ((paramAnonymousIntent.getAction().equals("android.intent.action.SCREEN_OFF")) && (Preferences.getUserPrefBoolean(paramAnonymousContext, "app_on", true)))
             {
-                Log.d(TAG, "xhh service start activity");
+                Log.d(TAG, Constants.TAG + "service start activity");
                 //KeyGuardService.this.log.i("android.intent.action.SCREEN_OFF");
                 //if ((Utils.checkDbExist(paramAnonymousContext)) && (!KeyGuardService.this.phoneState))
                 if (true)
@@ -70,7 +72,7 @@ public class KeyGuardService extends Service {
 
     public void onCreate()
     {
-        Log.d(TAG, "xhh: service create");
+        Log.d(TAG, Constants.TAG + "service create");
         super.onCreate();
         //MessageManager.getInstance().initialize(getApplicationContext());
         this.keyguardLock = ((KeyguardManager)getSystemService("keyguard")).newKeyguardLock("com.secretlisa.beidanci");
@@ -88,7 +90,7 @@ public class KeyGuardService extends Service {
     {
         super.onDestroy();
         //this.log.i("======onDestroy=====");
-        Log.d(TAG, "xhh: service destroy");
+        Log.d(TAG, Constants.TAG + "service destroy");
         unregisterReceiver(this.mMasterResetReciever);
 
     }
@@ -96,7 +98,7 @@ public class KeyGuardService extends Service {
     public void onStart(Intent paramIntent, int paramInt)
     {
         super.onStart(paramIntent, paramInt);
-        Log.d(TAG, "xhh: service start");
+        Log.d(TAG, Constants.TAG + "service start");
         //Utils.checkDbExist(this);
         if (paramIntent != null)
             switchApp(paramIntent.getStringExtra("action"));

@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import com.example.mylockscreen.R;
 import com.example.mylockscreen.services.KeyGuardService;
+import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.utils.Preferences;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "xhh: main activity create");
+        Log.d(TAG, Constants.TAG + "main activity create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lockBtn = (CheckBox) this.findViewById(R.id.lockBtn);
@@ -40,13 +41,13 @@ public class MainActivity extends Activity {
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Preferences.setUserPrefBoolean(MainActivity.this, "app_on", b);
                 Intent localIntent = new Intent(MainActivity.this, KeyGuardService.class);
-                Log.d(TAG, "xhh: checked changed");
+                Log.d(TAG, Constants.TAG + "checked changed");
                 if (b)
                     localIntent.putExtra("action", "com.secretlisa.beidanci.SWITCH_ON");
                 //while (true)
                 if (true)
                 {
-                    Log.d(TAG, "xhh: start service");
+                    Log.d(TAG, Constants.TAG + "start service");
                     MainActivity.this.startService(localIntent);
 /*                    if (!b){
                         localIntent.putExtra("action", "com.secretlisa.beidanci.SWITCH_OFF");
@@ -60,13 +61,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "xhh: main activity pause");
+        Log.d(TAG, Constants.TAG + "main activity pause");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "xhh: main activity destroy");
+        Log.d(TAG, Constants.TAG + "main activity destroy");
     }
 
     @Override
