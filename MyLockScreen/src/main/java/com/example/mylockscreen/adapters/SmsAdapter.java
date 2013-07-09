@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.example.mylockscreen.R;
 import com.example.mylockscreen.module.SmsHolder;
@@ -30,6 +31,10 @@ public class SmsAdapter extends BaseAdapter{
         mContext = context;
         mSmsList = smsItemArrayList;
         mInflater = LayoutInflater.from(context);
+    }
+
+    public void setData(ArrayList<SmsItem> itemArrayList){
+        mSmsList = itemArrayList;
     }
 
     @Override
@@ -58,7 +63,7 @@ public class SmsAdapter extends BaseAdapter{
             holder.mAddressView = (TextView) view.findViewById(R.id.sms_address);
             holder.mDateView = (TextView) view.findViewById(R.id.sms_date);
             holder.mBodyView = (TextView) view.findViewById(R.id.sms_body);
-            holder.mBodyLayout = (LinearLayout) view.findViewById(R.id.sms_body_layout);
+            holder.mFromLayout = (RelativeLayout) view.findViewById(R.id.sms_from_layout);
             view.setTag(holder);
         } else {
             Log.d(TAG, Constants.TAG + "view already used");
@@ -76,7 +81,7 @@ public class SmsAdapter extends BaseAdapter{
         holder.mBodyView.setOnClickListener(listener);
         holder.mAddressView.setOnClickListener(listener);
         holder.mDateView.setOnClickListener(listener);
-        holder.mBodyLayout.setOnClickListener(listener);
+        holder.mFromLayout.setOnClickListener(listener);
     }
 
     public class SmsClickListener implements View.OnClickListener{

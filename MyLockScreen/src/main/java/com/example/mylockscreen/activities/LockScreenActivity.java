@@ -28,6 +28,7 @@ import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.widgets.ChannelHorizontalScrollView;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class LockScreenActivity extends Activity
@@ -53,6 +54,8 @@ public class LockScreenActivity extends Activity
     private int mPreSelectItem = 0;
     private Context mContext = null ;
     private String SEPARATOR = "==== separator_for_lock_screen ===== \n";
+    ArrayList<SmsItem> mSmsList = new ArrayList<SmsItem>();
+    SmsAdapter mSmsAdapter;
 
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -117,6 +120,9 @@ public class LockScreenActivity extends Activity
                 if (person != null && ! "".equals(person)){
                     address = person;
                 }
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                String dateFormatted = formatter.format(Long.parseLong(date));
+                date = dateFormatted;
                 smsList.add(new SmsItem(address, date, body));
                 result += address + person + date + date_sent + subject + body + seen + SEPARATOR;
             }
@@ -148,6 +154,8 @@ public class LockScreenActivity extends Activity
                 String name = cur.getString(cur.getColumnIndex("name"));
                 String number = cur.getString(cur.getColumnIndex("formatted_number"));
                 String date = cur.getString(cur.getColumnIndex("date"));
+/*                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                date = formatter.format(date);*/
                 result += name + number + date + SEPARATOR;
             }
         }finally{
@@ -173,9 +181,9 @@ public class LockScreenActivity extends Activity
             if (i == 0){
                 listView.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.GONE);
-                ArrayList<SmsItem> smsList = getNewSmsCount();
-                SmsAdapter adapter = new SmsAdapter(LockScreenActivity.this, smsList);
-                listView.setAdapter(adapter);
+                mSmsList = getNewSmsCount();
+                mSmsAdapter = new SmsAdapter(LockScreenActivity.this, mSmsList);
+                listView.setAdapter(mSmsAdapter);
             } else if (i == 1){
                 text = readMissCall();
             }
@@ -409,6 +417,11 @@ public class LockScreenActivity extends Activity
     protected void onResume()
     {
         super.onResume();
+        mSmsList = getNewSmsCount();
+        if (mSmsAdapter != null){
+            mSmsAdapter.setData(mSmsList);
+            mSmsAdapter.notifyDataSetChanged();
+        }
         mHandler.postDelayed(AnimationDrawableTask, 300);
 /*        Utils.checkDailyWord(this);
         changeTime();

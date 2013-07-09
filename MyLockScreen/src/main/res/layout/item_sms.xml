@@ -4,25 +4,34 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/sms_address"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:id="@+id/sms_from_layout"
         android:layout_width="wrap_content"
-        ></TextView>
-    <LinearLayout
-        android:id="@+id/sms_body_layout"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="5dp"
+        >
         <TextView
-            android:id="@+id/sms_body"
-            android:layout_width="wrap_content"
+            android:id="@+id/sms_address"
             android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="11"
             ></TextView>
         <TextView
             android:id="@+id/sms_date"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></TextView>
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/sms_address"
+            android:layout_alignParentRight="true"
+            android:gravity="right"
+            android:text="22"
+            ></TextView>
+    </RelativeLayout>
 
+    <TextView
+        android:id="@+id/sms_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="33"
+        android:layout_marginBottom="5dp"
+        ></TextView>
 </LinearLayout>
