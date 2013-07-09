@@ -20,9 +20,11 @@ import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.example.mylockscreen.R;
+import com.example.mylockscreen.adapters.CallAdapter;
 import com.example.mylockscreen.adapters.LockScreenPageAdapter;
 import com.example.mylockscreen.adapters.SmsAdapter;
 import com.example.mylockscreen.controllers.Controllers;
+import com.example.mylockscreen.module.CallItem;
 import com.example.mylockscreen.module.SmsItem;
 import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.widgets.ChannelHorizontalScrollView;
@@ -55,7 +57,9 @@ public class LockScreenActivity extends Activity
     private Context mContext = null ;
     private String SEPARATOR = "==== separator_for_lock_screen ===== \n";
     ArrayList<SmsItem> mSmsList = new ArrayList<SmsItem>();
+    ArrayList<CallItem> mCallList = new ArrayList<CallItem>();
     SmsAdapter mSmsAdapter;
+    CallAdapter mCallAdapter;
 
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -134,8 +138,9 @@ public class LockScreenActivity extends Activity
         return smsList;
     }
 
-    private String readMissCall() {
+    private ArrayList<CallItem> readMissCall() {
         String result = "";
+        ArrayList<CallItem> callList = new ArrayList<CallItem>();
 /*
         Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, new String[] {
                 CallLog.Calls.TYPE
@@ -154,8 +159,12 @@ public class LockScreenActivity extends Activity
                 String name = cur.getString(cur.getColumnIndex("name"));
                 String number = cur.getString(cur.getColumnIndex("formatted_number"));
                 String date = cur.getString(cur.getColumnIndex("date"));
-/*                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                date = formatter.format(date);*/
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                date = formatter.format(Long.parseLong(date));
+                if (name != null && !"".equals(name)){
+                    number = name;
+                }
+                callList.add(new CallItem(number, date));
                 result += name + number + date + SEPARATOR;
             }
         }finally{
@@ -164,7 +173,7 @@ public class LockScreenActivity extends Activity
             }
         }
         Log.d(TAG, Constants.TAG + result);
-        return result;
+        return callList;
     }
 
     void addViewPagerView(){
@@ -185,7 +194,11 @@ public class LockScreenActivity extends Activity
                 mSmsAdapter = new SmsAdapter(LockScreenActivity.this, mSmsList);
                 listView.setAdapter(mSmsAdapter);
             } else if (i == 1){
-                text = readMissCall();
+                listView.setVisibility(View.VISIBLE);
+                textView.setVisibility(View.GONE);
+                mCallList = readMissCall();
+                mCallAdapter = new CallAdapter(LockScreenActivity.this, mCallList);
+                listView.setAdapter(mCallAdapter);
             }
             if ("".equals(text)){
                 text = "Content " + i;
@@ -418,9 +431,14 @@ public class LockScreenActivity extends Activity
     {
         super.onResume();
         mSmsList = getNewSmsCount();
+        mCallList = readMissCall();
         if (mSmsAdapter != null){
             mSmsAdapter.setData(mSmsList);
             mSmsAdapter.notifyDataSetChanged();
+        }
+        if (mCallAdapter != null){
+            mCallAdapter.setData(mCallList);
+            mCallAdapter.notifyDataSetChanged();
         }
         mHandler.postDelayed(AnimationDrawableTask, 300);
 /*        Utils.checkDailyWord(this);
