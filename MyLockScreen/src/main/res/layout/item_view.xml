@@ -13,4 +13,9 @@
         android:text="Content"
         android:textSize="80sp"
         android:layout_gravity="center"></TextView>
+    <ListView
+        android:id="@+id/item_listview"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:visibility="gone"></ListView>
 </LinearLayout>

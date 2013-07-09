@@ -18,13 +18,12 @@ import android.provider.CallLog;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.*;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 import com.example.mylockscreen.R;
 import com.example.mylockscreen.adapters.LockScreenPageAdapter;
+import com.example.mylockscreen.adapters.SmsAdapter;
 import com.example.mylockscreen.controllers.Controllers;
+import com.example.mylockscreen.module.SmsItem;
 import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.widgets.ChannelHorizontalScrollView;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
@@ -100,7 +99,8 @@ public class LockScreenActivity extends Activity
         String sms = Controllers.getInstance().getFileService().readStorage("sms");
         return sms;
     }
-    private String getNewSmsCount() {
+    private ArrayList<SmsItem> getNewSmsCount() {
+        ArrayList<SmsItem> smsList = new ArrayList<SmsItem>();
         String result = "";
         Cursor cur = getContentResolver().query(Uri.parse("content://sms"), null,
                 "type = 1 and read = 0", null, null);
@@ -114,6 +114,10 @@ public class LockScreenActivity extends Activity
                 String subject = cur.getString(cur.getColumnIndex("subject"));
                 String body = cur.getString(cur.getColumnIndex("body"));
                 String seen = cur.getString(cur.getColumnIndex("seen"));
+                if (person != null && ! "".equals(person)){
+                    address = person;
+                }
+                smsList.add(new SmsItem(address, date, body));
                 result += address + person + date + date_sent + subject + body + seen + SEPARATOR;
             }
         }finally{
@@ -121,7 +125,7 @@ public class LockScreenActivity extends Activity
                 cur.close();
             }
         }
-        return result;
+        return smsList;
     }
 
     private String readMissCall() {
@@ -163,11 +167,15 @@ public class LockScreenActivity extends Activity
         }
         for (int i = 0; i < mViewData.size(); i++){
             View v = getLayoutInflater().inflate(R.layout.item_view, null);
-            TextView textView = (TextView)v.findViewById(R.id.item_text);
-
+            TextView textView = (TextView) v.findViewById(R.id.item_text);
+            ListView listView = (ListView) v.findViewById(R.id.item_listview);
             String text = "Content " + i;
             if (i == 0){
-                text = getNewSmsCount();
+                listView.setVisibility(View.VISIBLE);
+                textView.setVisibility(View.GONE);
+                ArrayList<SmsItem> smsList = getNewSmsCount();
+                SmsAdapter adapter = new SmsAdapter(LockScreenActivity.this, smsList);
+                listView.setAdapter(adapter);
             } else if (i == 1){
                 text = readMissCall();
             }
