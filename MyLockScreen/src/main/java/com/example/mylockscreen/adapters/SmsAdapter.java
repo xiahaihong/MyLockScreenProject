@@ -72,12 +72,12 @@ public class SmsAdapter extends BaseAdapter{
         holder.mAddressView.setText(mSmsList.get(i).getmAddress());
         holder.mDateView.setText(mSmsList.get(i).getmDate());
         holder.mBodyView.setText(mSmsList.get(i).getmBody());
-        bindViewClickListener(holder);
+        bindViewClickListener(holder, mSmsList.get(i).getmThreadId());
         return view;
     }
 
-    public void bindViewClickListener(SmsHolder holder){
-        SmsClickListener listener = new SmsClickListener();
+    public void bindViewClickListener(SmsHolder holder, String threadId){
+        SmsClickListener listener = new SmsClickListener(threadId);
         holder.mBodyView.setOnClickListener(listener);
         holder.mAddressView.setOnClickListener(listener);
         holder.mDateView.setOnClickListener(listener);
@@ -85,10 +85,19 @@ public class SmsAdapter extends BaseAdapter{
     }
 
     public class SmsClickListener implements View.OnClickListener{
+        String mThreadId;
+        public SmsClickListener(){
+            mThreadId = "";
+        }
+        public SmsClickListener(String threadId){
+            mThreadId = threadId;
+        }
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.setData(Uri.parse("content://mms-sms"));
+/*            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setData(Uri.parse("content://mms-sms"));*/
+            Uri uri = Uri.parse("content://mms-sms/conversations/" + mThreadId);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             mContext.startActivity(intent);
         }
     }

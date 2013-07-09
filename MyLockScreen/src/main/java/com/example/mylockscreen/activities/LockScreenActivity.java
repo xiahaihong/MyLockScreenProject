@@ -121,13 +121,14 @@ public class LockScreenActivity extends Activity
                 String subject = cur.getString(cur.getColumnIndex("subject"));
                 String body = cur.getString(cur.getColumnIndex("body"));
                 String seen = cur.getString(cur.getColumnIndex("seen"));
+                String threadId = cur.getString(cur.getColumnIndex("thread_id"));
                 if (person != null && ! "".equals(person)){
                     address = person;
                 }
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 String dateFormatted = formatter.format(Long.parseLong(date));
                 date = dateFormatted;
-                smsList.add(new SmsItem(address, date, body));
+                smsList.add(new SmsItem(address, date, body, threadId));
                 result += address + person + date + date_sent + subject + body + seen + SEPARATOR;
             }
         }finally{
