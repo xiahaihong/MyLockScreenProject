@@ -17,6 +17,9 @@ import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.utils.Preferences;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
     CheckBox lockBtn;
@@ -28,6 +31,14 @@ public class MainActivity extends Activity {
 
     private Context mContext = null ;
 
+    private void requestRoot(){
+        Runtime runtime = Runtime.getRuntime();
+        try{
+            runtime.exec("su");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
     @Override
@@ -56,6 +67,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        requestRoot();
     }
 
     @Override

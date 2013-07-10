@@ -30,8 +30,15 @@ import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.widgets.ChannelHorizontalScrollView;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LockScreenActivity extends Activity
 {
@@ -64,7 +71,7 @@ public class LockScreenActivity extends Activity
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         sliderLayout = (SliderRelativeLayout)findViewById(R.id.slider_layout);
         imgView_getup_arrow = (ImageView)findViewById(R.id.getup_arrow);
         animArrowDrawable = (AnimationDrawable) imgView_getup_arrow.getBackground() ;
@@ -173,9 +180,72 @@ public class LockScreenActivity extends Activity
                 cur.close();
             }
         }
-        Log.d(TAG, Constants.TAG + result);
+        //Log.d(TAG, Constants.TAG + result);
         return callList;
     }
+
+    String getSystemNotification(){
+        String[] commands = {"dumpsys notification"};
+        Process process = null;
+        DataOutputStream dataOutputStream = null;
+        List<String> lineList = new ArrayList<String>();
+        try {
+            process = Runtime.getRuntime().exec("su");
+            dataOutputStream = new DataOutputStream(process.getOutputStream());
+            int length = commands.length;
+            for (int i = 0; i < length; i++) {
+                Log.d(TAG, "commands[" + i + "]:" + commands[i]);
+                dataOutputStream.writeBytes(commands[i] + "\n");
+            }
+            dataOutputStream.writeBytes("exit\n");
+            dataOutputStream.flush();
+
+            process.waitFor();
+            //process = Runtime.getRuntime().exec(commands);
+
+            BufferedReader reader = null;
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = "";
+
+            final StringBuilder log = new StringBuilder();
+            String separator = System.getProperty("line.separator");
+            Pattern pattern = Pattern.compile("pkg=[^\\s]+");
+            while ((line = reader.readLine()) != null) {
+                if(line != null && line.trim().startsWith("NotificationRecord")){
+                    Matcher matcher = pattern.matcher(line);
+                    if(matcher.find()){
+                        lineList.add(matcher.group());
+                    }else{
+                        Log.e(TAG, Constants.TAG + "what's this?!");
+                    }
+                }
+
+                log.append(line);
+                log.append(separator);
+            }
+            Log.d(TAG, Constants.TAG + "log:" + log.toString());
+
+            int size = lineList.size();
+            for (int i = 0; i < size; i++) {
+                Log.d(TAG, Constants.TAG + "app:" + lineList.get(i));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, Constants.TAG + "copy fail", e);
+        } finally {
+            try {
+                if (dataOutputStream != null) {
+                    dataOutputStream.close();
+                }
+                process.destroy();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d(TAG, Constants.TAG + "finish");
+    return Arrays.toString(lineList.toArray());
+    }
+
 
     void addViewPagerView(){
         mViewPagerViews = new ArrayList<View>();
@@ -200,6 +270,8 @@ public class LockScreenActivity extends Activity
                 mCallList = readMissCall();
                 mCallAdapter = new CallAdapter(LockScreenActivity.this, mCallList);
                 listView.setAdapter(mCallAdapter);
+            } else if (i == 2){
+                text = getSystemNotification();
             }
             if ("".equals(text)){
                 text = "Content " + i;
