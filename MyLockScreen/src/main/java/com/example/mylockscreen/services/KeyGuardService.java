@@ -47,8 +47,9 @@ public class KeyGuardService extends Service {
     {
         public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent)
         {
-            Log.d(TAG, Constants.TAG + "service receive");
-            if ((paramAnonymousIntent.getAction().equals("android.intent.action.SCREEN_OFF")) && (Preferences.getUserPrefBoolean(paramAnonymousContext, "app_on", true)))
+            String action = paramAnonymousIntent.getAction();
+            Log.d(TAG, Constants.TAG + "service receive " + action);
+            if ((action.equals("android.intent.action.SCREEN_OFF")) && (Preferences.getUserPrefBoolean(paramAnonymousContext, "app_on", true)))
             {
                 Log.d(TAG, Constants.TAG + "service start activity");
                 //KeyGuardService.this.log.i("android.intent.action.SCREEN_OFF");
@@ -81,7 +82,7 @@ public class KeyGuardService extends Service {
         localIntentFilter.addAction("android.intent.action.SCREEN_OFF");
         localIntentFilter.addAction("android.intent.action.SCREEN_ON");
         localIntentFilter.addAction("android.intent.action.PACKAGE_RESTARTED");
-        localIntentFilter.setPriority(1000);
+        localIntentFilter.setPriority(Integer.MAX_VALUE);
         registerReceiver(this.mMasterResetReciever, localIntentFilter);
         ((TelephonyManager)getSystemService("phone")).listen(this.listener, 32);
     }
