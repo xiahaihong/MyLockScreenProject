@@ -24,7 +24,14 @@ public class LockScreenPageAdapter extends PagerAdapter {
         }
     }
 
+    public View getViewFromList(int i){
+        return mViewList.get(i);
+    }
 
+
+    public void setView(int i, View v){
+        mViewList.set(i, v);
+    }
 
     @Override
     public void destroyItem(View view, int position, Object obj) {

@@ -5,6 +5,9 @@ package com.example.mylockscreen.activities;
  */
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +33,7 @@ import com.example.mylockscreen.module.SmsItem;
 import com.example.mylockscreen.utils.Constants;
 import com.example.mylockscreen.widgets.ChannelHorizontalScrollView;
 import com.example.mylockscreen.widgets.SliderRelativeLayout;
+import com.example.mylockscreen.widgets.WidgetLayout;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -41,7 +45,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LockScreenActivity extends Activity
+public class LockScreenActivity extends Activity implements View.OnClickListener
 {
     private ViewPager mViewPager;
     private ChannelHorizontalScrollView mScrollView;
@@ -68,6 +72,15 @@ public class LockScreenActivity extends Activity
     ArrayList<CallItem> mCallList = new ArrayList<CallItem>();
     SmsAdapter mSmsAdapter;
     CallAdapter mCallAdapter;
+
+
+    private AppWidgetHost mAppWidgetHost;
+    private AppWidgetManager mAppWidgetManager;
+    private WidgetLayout mWidgetLayout;
+    private static final int APPWIDGET_HOST_ID = 0x100;
+    private static final int REQUEST_PICK_APPWIDGET = 0;
+    private static final int REQUEST_CREATE_APPWIDGET = 1;
+    private static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
 
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -196,7 +209,7 @@ public class LockScreenActivity extends Activity
         DataOutputStream dataOutputStream = null;
         List<String> lineList = new ArrayList<String>();
         try {
-            process = Runtime.getRuntime().exec("sh");
+            process = Runtime.getRuntime().exec("su");
             dataOutputStream = new DataOutputStream(process.getOutputStream());
             int length = commands.length;
             for (int i = 0; i < length; i++) {
@@ -254,9 +267,10 @@ public class LockScreenActivity extends Activity
 
 
     void addViewPagerView(){
+        int tabCount = 5;
         mViewPagerViews = new ArrayList<View>();
         mViewData = new ArrayList<String>();
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < tabCount; i++){
             mViewData.add("Tab " + String.valueOf(i));
         }
         for (int i = 0; i < mViewData.size(); i++){
@@ -285,7 +299,22 @@ public class LockScreenActivity extends Activity
                 v.setBackgroundColor(R.color.channel_news_title_no_press);
                 textView.setTextSize(20);
             }
-            textView.setText(text);
+            if (i == mViewData.size() -1){
+                // for add view
+                v.setBackgroundResource(R.drawable.add);
+                mAppWidgetManager = AppWidgetManager.getInstance(mContext);
+                mAppWidgetHost = new AppWidgetHost(mContext, APPWIDGET_HOST_ID);
+                mAppWidgetHost.startListening();
+
+                //mWidgetLayout = new WidgetLayout(this);
+
+                //mWidgetLayout.setOnLongClickListener(this);
+                v.setOnClickListener(this);
+                //setContentView(mWidgetLayout);
+                //v = (View) mWidgetLayout;
+            } else {
+                textView.setText(text);
+            }
             v.setTag(mViewData.get(i));
             mViewPagerViews.add(v);
         }
@@ -332,6 +361,15 @@ public class LockScreenActivity extends Activity
         moveTitleLabel(0);
         mViewPager.setCurrentItem(0);
         mViewPager.setOnPageChangeListener(new ItemOnPageChangeListener());
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
+        pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetHost.allocateAppWidgetId());
+        // start the pick activity
+        startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
+        Log.d(TAG, Constants.TAG + "add click");
     }
 
     private class ItemOnPageChangeListener implements ViewPager.OnPageChangeListener{
@@ -410,6 +448,79 @@ public class LockScreenActivity extends Activity
         }
         mPreSelectItem = position;
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, Constants.TAG + "on activity result");
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_PICK_APPWIDGET:
+                    addAppWidget(data);
+                    break;
+                case REQUEST_CREATE_APPWIDGET:
+                    completeAddAppWidget(data);
+                    break;
+            }
+        } else if (requestCode == REQUEST_PICK_APPWIDGET
+                && resultCode == RESULT_CANCELED && data != null) {
+            int appWidgetId = data.getIntExtra(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+            if (appWidgetId != -1) {
+                mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+            }
+        }
+    }
+    private void addAppWidget(Intent data) {
+        Log.d(TAG, Constants.TAG + "add app widget");
+        int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1);
+        String customWidget = data.getStringExtra(EXTRA_CUSTOM_WIDGET);
+        if ("search_widget".equals(customWidget)) {
+            mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+        } else {
+            AppWidgetProviderInfo appWidget = mAppWidgetManager
+                    .getAppWidgetInfo(appWidgetId);
+
+            Log.d("addAppWidget", "configure:" + appWidget.configure);
+            if (appWidget.configure != null) {
+                // 弹出配置界面
+                Intent intent = new Intent(
+                        AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+                intent.setComponent(appWidget.configure);
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        appWidgetId);
+
+                startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
+            } else {
+                onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_OK,
+                        data);
+            }
+        }
+    }
+
+    /**
+     * 添加widget
+     *
+     * @param data
+     */
+    private void completeAddAppWidget(Intent data) {
+        Log.d(TAG, Constants.TAG + "complete add app widget");
+        Bundle extras = data.getExtras();
+        int appWidgetId = extras
+                .getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+
+        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager
+                .getAppWidgetInfo(appWidgetId);
+
+        View hostView = mAppWidgetHost.createView(this, appWidgetId,
+                appWidgetInfo);
+        mWidgetLayout = new WidgetLayout(mContext);
+        mWidgetLayout.addInScreen(hostView, appWidgetInfo.minWidth,
+                appWidgetInfo.minHeight);
+        View v = (View) mWidgetLayout;
+        mAdapter.setView(3, v);
+        mAdapter.notifyDataSetChanged();
+    }
 
 
     private void addCategoryView(int i, String title) {
@@ -461,8 +572,14 @@ public class LockScreenActivity extends Activity
 
     protected void onDestroy()
     {
+        try {
+            mAppWidgetHost.stopListening();
+        } catch (NullPointerException ex) {
+            Log.i(TAG, "problem while stopping AppWidgetHost during Launcher destruction", ex);
+        }
         Log.d(TAG, Constants.TAG + "activity screen lock view destroy");
         super.onDestroy();
+
 /*        if ((this.bitmap != null) && (!this.bitmap.isRecycled()))
             this.bitmap.recycle();*/
 /*        if (!((ApplicationBeidanci)getApplicationContext()).activityOn)
