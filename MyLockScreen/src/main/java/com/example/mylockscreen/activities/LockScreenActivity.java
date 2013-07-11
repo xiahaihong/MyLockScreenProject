@@ -4,6 +4,7 @@ package com.example.mylockscreen.activities;
  * Created by haihong.xiahh on 13-7-3.
  */
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -184,13 +185,18 @@ public class LockScreenActivity extends Activity
         return callList;
     }
 
+    void  getSystemNotificationFromService(){
+        String service = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(service);
+    }
+
     String getSystemNotification(){
-        String[] commands = {"dumpsys notification"};
+        String[] commands = {"/system/bin/dumpsys notification"};
         Process process = null;
         DataOutputStream dataOutputStream = null;
         List<String> lineList = new ArrayList<String>();
         try {
-            process = Runtime.getRuntime().exec("su");
+            process = Runtime.getRuntime().exec("sh");
             dataOutputStream = new DataOutputStream(process.getOutputStream());
             int length = commands.length;
             for (int i = 0; i < length; i++) {
