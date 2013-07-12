@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        requestRoot();
+        //requestRoot();
     }
 
     @Override

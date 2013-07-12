@@ -41,6 +41,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,6 +82,11 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     private static final int REQUEST_PICK_APPWIDGET = 2;
     private static final int REQUEST_CREATE_APPWIDGET = 1;
     private static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
+
+    private RelativeLayout mTimeLayout;
+    private TextView mTimeView;
+    private TextView mDayView;
+
     private void initViews(){
         // add flags to show before keyguard
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -102,25 +108,59 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
                 finish(); // 锁屏成功时，结束我们的Activity界面
         }
     };
+
+    private String getDayInfo(){
+        String dayInfo;
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        //dayInfo = String.valueOf(year) + "年" +
+        dayInfo = String.valueOf(month) + "月" + String.valueOf(day) + "日";
+        return dayInfo;
+    }
+
+    private String getTimeInfo(){
+        String timeInfo;
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        timeInfo = String.valueOf(hour) + ":" + String.valueOf(minute);
+        return timeInfo;
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mContext = LockScreenActivity.this;
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN ,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
         Log.d(TAG, Constants.TAG + "activity screen lock view create");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lock_screen_activity);
+
         initViews();
+
         this.mTimeChangeReceiver = new TimeChangeReceiver();
+
+        mTimeLayout = (RelativeLayout) findViewById(R.id.time_layout);
+        mTimeView = (TextView) findViewById(R.id.time_textview);
+        mDayView = (TextView) findViewById(R.id.day_textview);
+        String timeInfo = getTimeInfo();
+        String dayInfo = getDayInfo();
+        mTimeView.setText(timeInfo);
+        mDayView.setText(dayInfo);
+
         sliderLayout.setMainHandler(mHandler);
-
-
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mScrollView=(ChannelHorizontalScrollView)findViewById(R.id.h_scroll_view);
         mScrollLeft = (ImageView) findViewById(R.id.scroll_left);
         mScrollRight = (ImageView) findViewById(R.id.scroll_right);
         mTabBarLayout = (ViewGroup) findViewById(R.id.tab_bar_layout);
+
         addViewPagerView();
     }
 
@@ -210,7 +250,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         DataOutputStream dataOutputStream = null;
         List<String> lineList = new ArrayList<String>();
         try {
-            process = Runtime.getRuntime().exec("su");
+            process = Runtime.getRuntime().exec("sh");
             dataOutputStream = new DataOutputStream(process.getOutputStream());
             int length = commands.length;
             for (int i = 0; i < length; i++) {
