@@ -24,13 +24,6 @@ public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
     CheckBox lockBtn;
 
-    private SliderRelativeLayout sliderLayout = null;
-
-    private ImageView imgView_getup_arrow; // 动画图片
-    private AnimationDrawable animArrowDrawable = null;
-
-    private Context mContext = null ;
-
     private void requestRoot(){
         Runtime runtime = Runtime.getRuntime();
         try{
@@ -60,10 +53,6 @@ public class MainActivity extends Activity {
                 {
                     Log.d(TAG, Constants.TAG + "start service");
                     MainActivity.this.startService(localIntent);
-/*                    if (!b){
-                        localIntent.putExtra("action", "com.secretlisa.beidanci.SWITCH_OFF");
-                        break;
-                    }*/
                 }
             }
         });
