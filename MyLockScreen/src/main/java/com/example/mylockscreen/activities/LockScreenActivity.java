@@ -82,9 +82,11 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     private static final int REQUEST_CREATE_APPWIDGET = 1;
     private static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
     private void initViews(){
+        // add flags to show before keyguard
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // layout init for slider
         sliderLayout = (SliderRelativeLayout)findViewById(R.id.slider_layout);
         imgView_getup_arrow = (ImageView)findViewById(R.id.getup_arrow);
         animArrowDrawable = (AnimationDrawable) imgView_getup_arrow.getBackground() ;
@@ -95,7 +97,6 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         public void handleMessage(Message msg){
 
             Log.d(TAG, Constants.TAG + "handleMessage :  #### " );
-
             if(MSG_LOCK_SUCESS == msg.what)
                 Log.d(TAG, Constants.TAG + "finish");
                 finish(); // 锁屏成功时，结束我们的Activity界面
@@ -306,12 +307,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
                 mAppWidgetHost = new AppWidgetHost(mContext, APPWIDGET_HOST_ID);
                 mAppWidgetHost.startListening();
 
-                //mWidgetLayout = new WidgetLayout(this);
-
-                //mWidgetLayout.setOnLongClickListener(this);
                 v.setOnClickListener(this);
-                //setContentView(mWidgetLayout);
-                //v = (View) mWidgetLayout;
             } else {
                 textView.setText(text);
             }
@@ -367,13 +363,9 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     public void onClick(View view) {
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
         pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetHost.allocateAppWidgetId());
-        //pickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         // start the pick activity
         this.startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
         Log.d(TAG, Constants.TAG + "add click");
-/*        Intent testIntent = new Intent(this, TestActivity.class);
-        startActivity(testIntent);*/
-
     }
 
     private class ItemOnPageChangeListener implements ViewPager.OnPageChangeListener{
@@ -583,15 +575,6 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         }
         Log.d(TAG, Constants.TAG + "activity screen lock view destroy");
         super.onDestroy();
-
-/*        if ((this.bitmap != null) && (!this.bitmap.isRecycled()))
-            this.bitmap.recycle();*/
-/*        if (!((ApplicationBeidanci)getApplicationContext()).activityOn)
-        {
-            MobclickAgent.onKillProcess(this);
-            Database.getInstance(this).close();
-            Process.killProcess(Process.myPid());
-        }*/
     }
 
 /*
@@ -683,7 +666,6 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         public void onReceive(Context paramContext, Intent paramIntent)
         {
             String str = paramIntent.getAction();
-            //LockScreenActivity.this.log.d(str);
             LockScreenActivity.this.changeTime();
         }
 
