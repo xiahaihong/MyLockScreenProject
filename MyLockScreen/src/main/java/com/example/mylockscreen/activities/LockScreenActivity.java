@@ -83,7 +83,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     private static final int REQUEST_CREATE_APPWIDGET = 1;
     private static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
 
-    private RelativeLayout mTimeLayout;
+    private LinearLayout mTimeLayout;
     private TextView mTimeView;
     private TextView mDayView;
 
@@ -115,8 +115,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        //dayInfo = String.valueOf(year) + "年" +
-        dayInfo = String.valueOf(month) + "月" + String.valueOf(day) + "日";
+        dayInfo = String.valueOf(year) + "年" + String.valueOf(month) + "月" + String.valueOf(day) + "日";
         return dayInfo;
     }
 
@@ -146,7 +145,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
 
         this.mTimeChangeReceiver = new TimeChangeReceiver();
 
-        mTimeLayout = (RelativeLayout) findViewById(R.id.time_layout);
+        mTimeLayout = (LinearLayout) findViewById(R.id.time_layout);
         mTimeView = (TextView) findViewById(R.id.time_textview);
         mDayView = (TextView) findViewById(R.id.day_textview);
         String timeInfo = getTimeInfo();
@@ -349,6 +348,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
 
                 v.setOnClickListener(this);
             } else {
+                v.getBackground().setAlpha(0);
                 textView.setText(text);
             }
             v.setTag(mViewData.get(i));
