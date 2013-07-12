@@ -13,6 +13,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
@@ -753,5 +755,22 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
             appInfo +=  taskInfo.baseIntent.toString() + "\n";
         }
         return appInfo;
+    }
+
+    private String getLauncherInfo(){
+        ArrayList<Intent> intentList = new ArrayList<Intent>();
+        String launcherStr = "";
+        Intent intent=null;
+        final PackageManager packageManager=getPackageManager();
+        for(final ResolveInfo resolveInfo:packageManager.queryIntentActivities(new
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
+                PackageManager.MATCH_DEFAULT_ONLY)) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            intent=packageManager
+                    .getLaunchIntentForPackage(packageName);
+            intentList.add(intent);
+            launcherStr += packageName + "\n";
+        }
+        return launcherStr;
     }
 }
