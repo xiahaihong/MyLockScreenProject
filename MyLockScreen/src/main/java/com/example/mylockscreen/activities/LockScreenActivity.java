@@ -4,6 +4,7 @@ package com.example.mylockscreen.activities;
  * Created by haihong.xiahh on 13-7-3.
  */
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
@@ -342,7 +343,8 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
                 listView.setAdapter(mCallAdapter);
             } else if (i == 2){
                 // for system notification
-                text = getSystemNotification();
+                text = "sys notification : \n" + getSystemNotification();
+                text += "\n\nrecent app:\n" + getAPPInfo();
             }
 
             if ("".equals(text)){
@@ -741,5 +743,15 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     public void onBackPressed() {
         super.onBackPressed();
         Log.d(TAG, Constants.TAG + "back pressed");
+    }
+
+    private String getAPPInfo(){
+        String appInfo = "";
+        final ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RecentTaskInfo> recentTasks = am.getRecentTasks(5, ActivityManager.RECENT_IGNORE_UNAVAILABLE);
+        for (ActivityManager.RecentTaskInfo taskInfo : recentTasks){
+            appInfo +=  taskInfo.baseIntent.toString() + "\n";
+        }
+        return appInfo;
     }
 }
