@@ -314,7 +314,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
 
 
     void addViewPagerView(){
-        int tabCount = 5;
+        int tabCount = 4;
         mViewPagerViews = new ArrayList<View>();
         mViewData = new ArrayList<String>();
         for (int i = 0; i < tabCount; i++){
@@ -325,34 +325,39 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
             TextView textView = (TextView) v.findViewById(R.id.item_text);
             ListView listView = (ListView) v.findViewById(R.id.item_listview);
             String text = "Content " + i;
+
             if (i == 0){
+                // for sms
                 listView.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.GONE);
                 mSmsList = getNewSmsCount();
                 mSmsAdapter = new SmsAdapter(LockScreenActivity.this, mSmsList);
                 listView.setAdapter(mSmsAdapter);
             } else if (i == 1){
+                // for call
                 listView.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.GONE);
                 mCallList = readMissCall();
                 mCallAdapter = new CallAdapter(LockScreenActivity.this, mCallList);
                 listView.setAdapter(mCallAdapter);
             } else if (i == 2){
+                // for system notification
                 text = getSystemNotification();
             }
+
             if ("".equals(text)){
                 text = "Content " + i;
             } else {
                 v.setBackgroundColor(R.color.channel_news_title_no_press);
                 textView.setTextSize(20);
             }
+
             if (i == mViewData.size() -1){
                 // for add view
                 v.setBackgroundResource(R.drawable.add);
                 mAppWidgetManager = AppWidgetManager.getInstance(mContext);
                 mAppWidgetHost = new AppWidgetHost(mContext, APPWIDGET_HOST_ID);
                 mAppWidgetHost.startListening();
-
                 v.setOnClickListener(this);
             } else {
                 v.getBackground().setAlpha(0);
@@ -561,7 +566,13 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         mWidgetLayout.addInScreen(hostView, appWidgetInfo.minWidth,
                 appWidgetInfo.minHeight);
         View v = (View) mWidgetLayout;
-        mAdapter.setView(3, v);
+
+        // add view
+        mViewPagerViews.add(v);
+        int index = mViewPagerViews.size() -1 ;
+        mViewData.add("Tab " + String.valueOf(index));
+        addCategoryView(index, "Tab " + index);
+        mAdapter.setmViewList(mViewPagerViews);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -572,7 +583,7 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
                 -1, -1));
         titleItem.setText(title);
         titleItem.setTextSize(18);
-        titleItem.setTag(mViewData.get(i));
+        titleItem.setTag(title);
 
         if (i == 0) {
             titleItem.setTextColor(getResources().getColor(

@@ -28,6 +28,9 @@ public class LockScreenPageAdapter extends PagerAdapter {
         return mViewList.get(i);
     }
 
+    public void setmViewList(List<View> list){
+        mViewList = list;
+    }
 
     public void setView(int i, View v){
         mViewList.set(i, v);
