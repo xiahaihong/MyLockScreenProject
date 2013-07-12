@@ -87,6 +87,8 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     private TextView mTimeView;
     private TextView mDayView;
 
+    private boolean flagRigister = false;
+
     private void initViews(){
         // add flags to show before keyguard
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -639,11 +641,11 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         animArrowDrawable.stop();
         try
         {
-/*            if (this.flagRigister)
+            if (this.flagRigister)
             {
                 this.mTimeChangeReceiver.unregister();
                 this.flagRigister = false;
-            }*/
+            }
             return;
         }
         catch (Exception localException)
@@ -666,21 +668,9 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
             mCallAdapter.notifyDataSetChanged();
         }
         mHandler.postDelayed(AnimationDrawableTask, 300);
-/*        Utils.checkDailyWord(this);
         changeTime();
         this.mTimeChangeReceiver.register();
         this.flagRigister = true;
-        String str = getIntent().getAction();
-        this.mScreenView.refresh();
-        if (str != null)
-            this.mScreenView.postDelayed(new Runnable()
-            {
-                public void run()
-                {
-                    LockScreenActivity.this.mScreenView.mDotSwitchView.play();
-                }
-            }
-                    , 500L);*/
     }
 
     public boolean onTouchEvent(MotionEvent paramMotionEvent)
@@ -724,6 +714,10 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     }
     private void changeTime()
     {
+        String timeInfo = getTimeInfo();
+        String dayInfo = getDayInfo();
+        mDayView.setText(dayInfo);
+        mTimeView.setText(timeInfo);
     }
 
 
