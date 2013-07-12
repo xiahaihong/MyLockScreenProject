@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.CallLog;
 import android.support.v4.view.ViewPager;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -113,19 +114,23 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
 
     private String getDayInfo(){
         String dayInfo;
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        dayInfo = String.valueOf(year) + "年" + String.valueOf(month) + "月" + String.valueOf(day) + "日";
+        Time time = new Time();
+        time.setToNow();
+        int year = time.year;
+        int month = time.month + 1;
+        int day = time.monthDay;
+        int weekday = time.weekDay;
+        dayInfo = String.valueOf(year) + "年" + String.valueOf(month) + "月" + String.valueOf(day) + "日 "
+                + "星期" + String.valueOf(weekday);
         return dayInfo;
     }
 
     private String getTimeInfo(){
         String timeInfo;
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+        Time time = new Time();
+        time.setToNow();
+        int hour = time.hour;
+        int minute = time.minute;
         timeInfo = String.valueOf(hour) + ":" + String.valueOf(minute);
         return timeInfo;
     }
