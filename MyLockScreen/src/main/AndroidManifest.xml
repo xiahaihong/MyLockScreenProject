@@ -28,19 +28,22 @@
         android:name=".BootstrapApp">
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <service
             android:name=".services.KeyGuardService"
             android:label="@string/app_name"></service>
         <activity
             android:name=".activities.LockScreenActivity"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name"
+            android:launchMode="singleTask"></activity>
         <receiver android:name=".receivers.SMSReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -48,6 +51,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </receiver>
+        <activity
+            android:name=".activities.TestActivity"
+            ></activity>
     </application>
 
 </manifest>

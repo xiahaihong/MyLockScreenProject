@@ -78,10 +78,9 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     private AppWidgetManager mAppWidgetManager;
     private WidgetLayout mWidgetLayout;
     private static final int APPWIDGET_HOST_ID = 0x100;
-    private static final int REQUEST_PICK_APPWIDGET = 0;
+    private static final int REQUEST_PICK_APPWIDGET = 2;
     private static final int REQUEST_CREATE_APPWIDGET = 1;
     private static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
-
     private void initViews(){
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -95,9 +94,10 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
 
         public void handleMessage(Message msg){
 
-            Log.i(TAG, "handleMessage :  #### " );
+            Log.d(TAG, Constants.TAG + "handleMessage :  #### " );
 
             if(MSG_LOCK_SUCESS == msg.what)
+                Log.d(TAG, Constants.TAG + "finish");
                 finish(); // 锁屏成功时，结束我们的Activity界面
         }
     };
@@ -367,9 +367,13 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     public void onClick(View view) {
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
         pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetHost.allocateAppWidgetId());
+        //pickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         // start the pick activity
-        startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
+        this.startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
         Log.d(TAG, Constants.TAG + "add click");
+/*        Intent testIntent = new Intent(this, TestActivity.class);
+        startActivity(testIntent);*/
+
     }
 
     private class ItemOnPageChangeListener implements ViewPager.OnPageChangeListener{
@@ -590,11 +594,13 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         }*/
     }
 
+/*
     protected void onNewIntent(Intent paramIntent)
     {
         super.onNewIntent(paramIntent);
-        //this.log.d("=========onNewIntent========");
+        Log.d(TAG, Constants.TAG + "new intent");
     }
+*/
 
     private Runnable AnimationDrawableTask = new Runnable(){
 
@@ -660,12 +666,13 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
         return super.onTouchEvent(paramMotionEvent);
     }
 
-    protected void onUserLeaveHint()
+/*    protected void onUserLeaveHint()
     {
         //this.log.d("onUserLeaveHint");
+        Log.d(TAG, Constants.TAG + "user leave finish");
         super.onUserLeaveHint();
         finish();
-    }
+    }*/
 
     class TimeChangeReceiver extends BroadcastReceiver
     {
@@ -698,20 +705,9 @@ public class LockScreenActivity extends Activity implements View.OnClickListener
     }
 
 
-
-/*
-    public void onAttachedToWindow() {
-        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-        super.onAttachedToWindow();
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.d(TAG, Constants.TAG + "back pressed");
     }
-
-
-    public boolean onKeyDown(int keyCode ,KeyEvent event){
-
-        if(event.getKeyCode() == KeyEvent.KEYCODE_BACK)
-            return true ;
-        else
-            return super.onKeyDown(keyCode, event);
-
-    }*/
 }
